@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@nextui-org/input";
 
-export default function TestClassification() {
+export default function TextClassification() {
   // Keep track of the classification result and the model loading status.
   const [result, setResult] = useState(null);
   const [ready, setReady] = useState(null);
@@ -51,9 +51,11 @@ export default function TestClassification() {
   }, []);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-12">
-      <h1 className="text-5xl font-bold mb-2 text-center">Transformers.js</h1>
+      <h1 className="text-5xl font-bold mb-2 text-center">
+        Text Classification
+      </h1>
       <h2 className="text-2xl mb-4 text-center">
-        Next.js template (client-side)
+        Classify the entered as positive or negative
       </h2>
       <Input
         placeholder="enter text here"
