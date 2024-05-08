@@ -1,8 +1,7 @@
-
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Input } from "@nextui-org/input";
 
 export default function TestClassification() {
-
   // Keep track of the classification result and the model loading status.
   const [result, setResult] = useState(null);
   const [ready, setReady] = useState(null);
@@ -14,31 +13,35 @@ export default function TestClassification() {
   useEffect(() => {
     if (!worker.current) {
       // Create the worker if it does not yet exist.
-      worker.current = new Worker(new URL('../worker/worker', import.meta.url), {
-        type: 'module'
-      });
+      worker.current = new Worker(
+        new URL("../worker/worker", import.meta.url),
+        {
+          type: "module",
+        }
+      );
     }
 
     // Create a callback function for messages from the worker thread.
     const onMessageReceived = (e) => {
       switch (e.data.status) {
-        case 'initiate':
+        case "initiate":
           setReady(false);
           break;
-        case 'ready':
+        case "ready":
           setReady(true);
           break;
-        case 'complete':
-          setResult(e.data.output[0])
+        case "complete":
+          setResult(e.data.output[0]);
           break;
       }
     };
 
     // Attach the callback function as an event listener.
-    worker.current.addEventListener('message', onMessageReceived);
+    worker.current.addEventListener("message", onMessageReceived);
 
     // Define a cleanup function for when the component is unmounted.
-    return () => worker.current.removeEventListener('message', onMessageReceived);
+    return () =>
+      worker.current.removeEventListener("message", onMessageReceived);
   });
 
   const classify = useCallback((text) => {
@@ -49,22 +52,22 @@ export default function TestClassification() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-12">
       <h1 className="text-5xl font-bold mb-2 text-center">Transformers.js</h1>
-      <h2 className="text-2xl mb-4 text-center">Next.js template (client-side)</h2>
-      <input
-        type="text"
-        className="w-full max-w-xs p-2 border text-gray-950 border-gray-300 rounded mb-4"
-        placeholder="Enter text here"
-        onInput={e => {
+      <h2 className="text-2xl mb-4 text-center">
+        Next.js template (client-side)
+      </h2>
+      <Input
+        placeholder="enter text here"
+        className="w-full max-w-xs p-2  mb-4"
+        onInput={(e) => {
           classify(e.target.value);
         }}
       />
 
       {ready !== null && (
         <pre className="bg-primary-100 p-2 rounded">
-          {
-            (!ready || !result) ? 'Loading...' : JSON.stringify(result, null, 2)}
+          {!ready || !result ? "Loading..." : JSON.stringify(result, null, 2)}
         </pre>
       )}
     </main>
-  )
+  );
 }
