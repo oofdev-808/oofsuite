@@ -6,7 +6,7 @@ import TransformerWraper from "./TransformerWrapper";
 const Transformer = () => {
   useEffect(() => {
     (async () => {
-      let classifier = await pipeline("sentiment-analysis","Xenova/oof-distilbert-base-uncased-finetuned-sst-2-english");
+      let classifier = await pipeline("sentiment-analysis","Xenova/distilbert-base-uncased-finetuned-sst-2-english");
       let result = await classifier("I love transformers!");
       // [{'label': 'POSITIVE', 'score': 0.9998}]
       console.log(result);
