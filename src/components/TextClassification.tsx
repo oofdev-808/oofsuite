@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@nextui-org/input";
+import Progress from "./Progress";
 
 export default function TextClassification() {
   // Keep track of the classification result and the model loading status.
   const [result, setResult] = useState(null);
   const [ready, setReady] = useState(null);
+  const [progressItems, setProgressItems] = useState([]);
 
   // Create a reference to the worker object.
   const worker = useRef(null);
@@ -23,11 +25,32 @@ export default function TextClassification() {
 
     // Create a callback function for messages from the worker thread.
     const onMessageReceived = (e) => {
+      console.log(e.data, "onMessageReceived");
       switch (e.data.status) {
         case "initiate":
+          // Model file start load: add a new progress item to the list.
           setReady(false);
+          setProgressItems((prev) => [...prev, e.data]);
+          break;
+        case "progress":
+          // Model file progress: update one of the progress items.
+          setProgressItems((prev) =>
+            prev.map((item) => {
+              if (item.file === e.data.file) {
+                return { ...item, progress: e.data.progress };
+              }
+              return item;
+            })
+          );
+          break;
+        case "done":
+          // Model file loaded: remove the progress item from the list.
+          // setProgressItems((prev) =>
+          //   prev.filter((item) => item.file !== e.data.file)
+          // );
           break;
         case "ready":
+          // Pipeline ready: the worker is ready to accept messages.
           setReady(true);
           break;
         case "complete":
@@ -55,7 +78,7 @@ export default function TextClassification() {
         Text Classification
       </h1>
       <h2 className="text-2xl mb-4 text-center">
-        Classify the entered as positive or negative
+        Classify text as positive or negative
       </h2>
       <Input
         placeholder="enter text here"
@@ -70,6 +93,15 @@ export default function TextClassification() {
           {!ready || !result ? "Loading..." : JSON.stringify(result, null, 2)}
         </pre>
       )}
+
+      <div>
+        {ready === false && <label>Loading models... (only run once)</label>}
+        {ready === false && progressItems.map((data) => (
+          <div key={data.file}>
+            <Progress text={data.file} percentage={data.progress} />
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
